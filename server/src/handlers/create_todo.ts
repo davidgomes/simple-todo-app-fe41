@@ -1,16 +1,25 @@
 
+import { db } from '../db';
+import { todosTable } from '../db/schema';
 import { type CreateTodoInput, type Todo } from '../schema';
 
-export async function createTodo(input: CreateTodoInput): Promise<Todo> {
-    // This is a placeholder declaration! Real code should be implemented here.
-    // The goal of this handler is creating a new todo item for the authenticated user.
-    // Should persist the todo in the database and return the created todo.
-    return Promise.resolve({
-        id: 1,
-        user_id: input.user_id,
+export const createTodo = async (input: CreateTodoInput, userId: number): Promise<Todo> => {
+  try {
+    // Insert todo record with the authenticated user's ID
+    const result = await db.insert(todosTable)
+      .values({
         title: input.title,
-        completed: false,
-        created_at: new Date(),
-        updated_at: new Date()
-    });
-}
+        description: input.description || null,
+        user_id: userId,
+        completed: false // Default value
+      })
+      .returning()
+      .execute();
+
+    const todo = result[0];
+    return todo;
+  } catch (error) {
+    console.error('Todo creation failed:', error);
+    throw error;
+  }
+};

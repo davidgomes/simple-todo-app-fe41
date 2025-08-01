@@ -1,19 +1,20 @@
 
-import { serial, text, pgTable, timestamp, integer, boolean } from 'drizzle-orm/pg-core';
+import { serial, text, pgTable, timestamp, boolean, integer } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 
 export const usersTable = pgTable('users', {
   id: serial('id').primaryKey(),
   email: text('email').notNull().unique(),
-  password_hash: text('password_hash').notNull(),
+  name: text('name').notNull(),
   created_at: timestamp('created_at').defaultNow().notNull(),
 });
 
 export const todosTable = pgTable('todos', {
   id: serial('id').primaryKey(),
-  user_id: integer('user_id').notNull().references(() => usersTable.id, { onDelete: 'cascade' }),
   title: text('title').notNull(),
+  description: text('description'),
   completed: boolean('completed').notNull().default(false),
+  user_id: integer('user_id').notNull().references(() => usersTable.id),
   created_at: timestamp('created_at').defaultNow().notNull(),
   updated_at: timestamp('updated_at').defaultNow().notNull(),
 });
